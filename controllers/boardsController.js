@@ -7,12 +7,12 @@ import mongoose from "mongoose";
 // @route   POST '/api/boards/'
 // @access  private
 const createBoard = asyncHandler(async (req, res, next) => {
-  const { board, user } = req.body;
+  const { board } = req.body;
   // If User already has board. Find by user id and update it
-  const userBoardExists = await Board.findOneAndUpdate({ user }, { $push: { 'boards': board } }, { new: true });
+  const userBoardExists = await Board.findOneAndUpdate({ user: req.user }, { $push: { 'boards': board } }, { new: true });
   // Else create new board for new user
   if (!userBoardExists) {
-    const newBoard = await Board.create({ boards: board, user });
+    const newBoard = await Board.create({ boards: board, user: req.user });
     await newBoard.save();
     res.json(newBoard);
     return;
@@ -25,7 +25,7 @@ const createBoard = asyncHandler(async (req, res, next) => {
 // @access  private
 const deleteBoard = asyncHandler(async (req, res, next) => {
   const { boardId } = req.params;
-  const boardToDelete = await Board.findOne({ user: '64e8a00019fefd816c5863da' });
+  const boardToDelete = await Board.findOne({ user: req.user._id });
   if (!boardToDelete) {
     throw new Error('No Board Found');
   }
@@ -44,14 +44,14 @@ const deleteBoard = asyncHandler(async (req, res, next) => {
 // @route   GET '/api/boards/'
 // @access  private
 const getAllBoards = asyncHandler(async (req, res, next) => {
-  const { userId } = req.body;
-  const allBoards = await Board.findOne({ user: userId });
+  // const { userId } = req.body;
+  const allBoards = await Board.findOne({ user: req.user._id });
 
   if (!allBoards) {
     throw new Error('No Boards Found');
   }
 
-  res.json({ allBoards });
+  res.json(allBoards);
 });
 
 
@@ -62,7 +62,7 @@ const addNewColumn = asyncHandler(async (req, res, next) => {
   const { boardId } = req.params;
   const { columns } = req.body;
 
-  const userBoards = await Board.findOne({ user: '64e8a00019fefd816c5863da' });
+  const userBoards = await Board.findOne({ user: req.user._id });
   if (!userBoards) {
     throw new Error('No Board Found');
   }
@@ -98,7 +98,7 @@ const updateTasks = asyncHandler(async (req, res, next) => {
   const { boardId, columnId, taskId } = req.params;
   const { task, isNewTask } = req.body;
   // Find Board by user id;
-  const boardToUpdate = await Board.findOne({ user: '64e8a00019fefd816c5863da' });
+  const boardToUpdate = await Board.findOne({ user: req.user._id });
   if (!boardToUpdate) {
     throw new Error('No Board Found');
   }
@@ -143,7 +143,7 @@ const updateTasks = asyncHandler(async (req, res, next) => {
 // @access  private
 const deleteTask = asyncHandler(async (req, res, next) => {
   const { boardId, columnId, taskId } = req.params;
-  const boardToUpdate = await Board.findOne({ user: '64e8a00019fefd816c5863da' });
+  const boardToUpdate = await Board.findOne({ user: req.user._id });
   if (!boardToUpdate) {
     throw new Error('No Board Found');
   }
