@@ -19,11 +19,11 @@ const userSchema = mongoose.Schema({
 
 }, { timestamps: true });
 
-
+// check password for login in user
 userSchema.method('matchPassword', async function (enteredPassword, userPassword) {
   return await bcrypt.compare(enteredPassword, userPassword);
 });
-
+// Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();

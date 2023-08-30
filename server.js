@@ -8,6 +8,7 @@ import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
 // App imports
 import userRouter from './router/userRouter.js';
+import boardsRouter from './router/boardsRouter.js';
 
 const port = process.env.PORT || 8000;//server running on PORT
 connectDB();//Connect to MongoDB;
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/boards', boardsRouter);
 
 
 app.listen(port, () => console.log('Server is running on ' + port));
